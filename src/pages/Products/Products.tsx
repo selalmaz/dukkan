@@ -1,30 +1,50 @@
 import React from 'react';
-import {ActivityIndicator, FlatList, SafeAreaView} from 'react-native';
-import Config from 'react-native-config';
+import { FlatList, SafeAreaView } from 'react-native';
 import ProductCard from '../../components/ProductCard';
 import useFetch from '../../hooks/useFetch';
 import Loading from '../../components/Loading';
 import Error from '../../components/Error';
 
-const API_KEY = 'https://fakestoreapi.com/products';
-const Products = () => {
-  const {error,loading, data} = useFetch(API_KEY);
+type Product = {
+  id: number;
+  title: string;
+  price: number;
+  description: string;
+  category: string;
+  image: string;
+};
 
-  const renderProducts = ({item}: any) => (
-    <ProductCard products={item}></ProductCard>
+const API_KEY = 'https://fakestoreapi.com/products';
+
+const Products = ({ navigation }: any) => {
+  const { error, loading, data } = useFetch<Product[]>(API_KEY);
+
+  const ProductSelect = (id: number) => {
+    navigation.navigate("DetailPage", { id });
+  };
+
+  const renderProducts = ({ item }: { item: Product }) => (
+    <ProductCard 
+      products={item} 
+      onSelect={() => ProductSelect(item.id)} // onSelect fonksiyonunu callback olarak geçiyoruz
+    />
   );
 
-  if(error){
-    console.log('hata')
-     return <Error></Error>
+  if (error) {
+    console.log('hata');
+    return <Error />;
   }
 
   return (
-    <SafeAreaView style={{flex:1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       {loading ? (
-        <Loading></Loading>
+        <Loading />
       ) : (
-        <FlatList data={data} renderItem={renderProducts}></FlatList>
+        <FlatList 
+          data={data} 
+          renderItem={renderProducts} 
+          keyExtractor={item => item.id.toString()} // keyExtractor ile her bir öğeye benzersiz bir anahtar atıyoruz
+        />
       )}
     </SafeAreaView>
   );
