@@ -3,19 +3,26 @@ import {ActivityIndicator, FlatList, SafeAreaView} from 'react-native';
 import Config from 'react-native-config';
 import ProductCard from '../../components/ProductCard';
 import useFetch from '../../hooks/useFetch';
+import Loading from '../../components/Loading';
+import Error from '../../components/Error';
 
 const API_KEY = 'https://fakestoreapi.com/products';
 const Products = () => {
-  const {loading, data} = useFetch(API_KEY);
+  const {error,loading, data} = useFetch(API_KEY);
 
   const renderProducts = ({item}: any) => (
     <ProductCard products={item}></ProductCard>
   );
 
+  if(error){
+    console.log('hata')
+     return <Error></Error>
+  }
+
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex:1}}>
       {loading ? (
-        <ActivityIndicator size="large"></ActivityIndicator>
+        <Loading></Loading>
       ) : (
         <FlatList data={data} renderItem={renderProducts}></FlatList>
       )}
